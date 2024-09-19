@@ -1,4 +1,4 @@
-name: FastAPI Deployment to S3 - Minimal Test
+name: FastAPI Deployment to S3
 
 on:
   workflow_dispatch:  # Allows manual triggering
@@ -9,16 +9,34 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # This action should be valid
+        uses: actions/checkout@v3
 
-      # Minimal AWS credentials setup
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2  # Testing this action
+      # Install Python dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Test with secrets
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Zip FastAPI app
+      - name: Zip FastAPI app
+        run: |
+          mkdir -p deploy
+          zip -r deploy/fastapi_app.zip SourceCode/
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-east-1"
 
-      # Simple step to verify the setup
-      - name: Verify AWS CLI
-        run: aws s3 ls  # Just list the buckets as a test
+      # Upload to S3
+      - name: Upload to S3
+        run: |
+          aws s3 cp deploy/fastapi_app.zip s3://mydata-venkey/fastapi_app.zip
