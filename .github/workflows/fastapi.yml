@@ -1,7 +1,7 @@
-name: FastAPI Deployment
+name: FastAPI Deployment to S3
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   build-and-deploy:
@@ -9,31 +9,31 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Correct use of 'uses' for an action
 
       # Install Python dependencies
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v4  # Correct use of 'uses' for an action
         with:
-          python-version: '3.x'
+          python-version: '3.x'  # Use the appropriate version
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt  # Install FastAPI, Mangum, etc.
 
       # Step to zip the FastAPI app and other files
       - name: Zip FastAPI app
         run: |
           mkdir -p deploy
-          zip -r deploy/fastapi_app.zip SourceCode/
+          zip -r deploy/fastapi_app.zip SourceCode/  # Zip the entire folder
 
-      # Correct use of aws-actions/configure-aws-credentials
+      # Correct use of aws-actions/configure-aws-credentials as an action inside steps
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v2  # Correct use of 'uses' for an action
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Replace with hardcoded values if needed
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Replace with hardcoded values if needed
           aws-region: "us-east-1"
 
       # Step to upload the zip file to S3
